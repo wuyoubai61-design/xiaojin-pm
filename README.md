@@ -93,50 +93,6 @@ https://<你的GitHub用户名>.github.io/<仓库名>/ai-assistant-xiaojin.html
 └── README.md                    # 本说明文档
 ```
 
----
-
-## ⚡ 快速开始
-
-### 方式一：本地运行（最简单）
-1. 下载 `ai-assistant-xiaojin.html`
-2. 双击在浏览器中打开即可
-
-### 方式二：克隆仓库
-```bash
-git clone https://github.com/<你的用户名>/<仓库名>.git
-cd <仓库名>
-# 使用任意静态服务器，例如：
-npx serve .
-# 或使用 Python
-python -m http.server 8080
-```
-然后访问 `http://localhost:8080/ai-assistant-xiaojin.html`
-
----
-
-## 🌐 部署到 GitHub Pages
-
-1. **创建仓库**：在 GitHub 新建一个仓库（例如 `ai-assistant-xiaojin`）
-2. **推送代码**：
-   ```bash
-   git init
-   git add .
-   git commit -m "feat: 初始化 AI助手小金项目"
-   git branch -M main
-   git remote add origin https://github.com/<你的用户名>/<仓库名>.git
-   git push -u origin main
-   ```
-3. **开启 Pages**：
-   - 进入仓库 `Settings` → `Pages`
-   - `Source` 选择 `Deploy from a branch`
-   - `Branch` 选择 `main` + `/ (root)`，保存
-4. **访问链接**：
-   ```
-   https://<你的用户名>.github.io/<仓库名>/ai-assistant-xiaojin.html
-   ```
-
----
-
 ## 📊 数据说明
 
 - 当前页面内置数据为 **虚构脱敏示例数据**，时间窗口：`2026-03-20 ~ 2026-04-20`
