@@ -18,17 +18,6 @@
 
 ---
 
-## 🚀 在线预览
-
-> 部署到 GitHub Pages 后即可访问：
-
-```
-https://<你的GitHub用户名>.github.io/<仓库名>/ai-assistant-xiaojin.html
-```
-
-部署方式见下方 [部署到 GitHub Pages](#-部署到-github-pages)。
-
----
 
 ## 🧩 核心功能
 
