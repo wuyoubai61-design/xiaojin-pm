@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI助手小金 · 产品经理日常管理</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root, [data-theme="dark"]{
+  --bg:#0b1020; --bg-2:#111937;
+  --panel:rgba(255,255,255,0.04); --panel-border:rgba(255,255,255,0.08);
+  --panel-solid:#0f1530;
+  --text:#e6ebff; --text-2:#9aa5c9;
+  --brand:#7c5cff; --brand-2:#22d3ee;
+  --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444; --gold:#ffcf5c;
+  --chart-axis:#2a3460; --chart-label:#9aa5c9; --chart-split:rgba(255,255,255,0.05);
+  --bg-gradient:radial-gradient(1200px 600px at 80% -10%, rgba(124,92,255,0.25), transparent 60%),radial-gradient(900px 500px at -10% 20%, rgba(34,211,238,0.18), transparent 60%),linear-gradient(180deg,#070b1a 0%,#0b1020 100%);
+  --scroll-thumb:#1e2746;
+}
+[data-theme="light"]{
+  --bg:#f4f6fb; --bg-2:#ffffff;
+  --panel:#ffffff; --panel-border:#e5e9f2;
+  --panel-solid:#ffffff;
+  --text:#1e2746; --text-2:#6b7591;
+  --brand:#6d50ff; --brand-2:#0ea5c4;
+  --ok:#16a34a; --warn:#d97706; --danger:#dc2626; --gold:#ca8a04;
+  --chart-axis:#d6dbe8; --chart-label:#6b7591; --chart-split:rgba(30,39,70,0.08);
+  --bg-gradient:radial-gradient(1200px 600px at 80% -10%, rgba(124,92,255,0.12), transparent 60%),radial-gradient(900px 500px at -10% 20%, rgba(14,165,196,0.1), transparent 60%),linear-gradient(180deg,#f4f6fb 0%,#eef1f8 100%);
+  --scroll-thumb:#c7cee0;
+}
+html,body{height:100%;}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);
+  background:var(--bg-gradient);
+  min-height:100vh;overflow-x:hidden;transition:background .3s;
+}
+[data-theme="light"] .sev-p0{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;}
+[data-theme="light"] .sev-p1{background:#fef3c7;color:#b45309;border:1px solid #fcd34d;}
+[data-theme="light"] .sev-p2{background:#cffafe;color:#0e7490;border:1px solid #67e8f9;}
+[data-theme="light"] .sev-p3{background:#e2e8f0;color:#475569;border:1px solid #cbd5e1;}
+[data-theme="light"] .card{box-shadow:0 4px 16px rgba(30,39,70,0.06);}
+[data-theme="light"] nav a.active{background:linear-gradient(90deg,rgba(109,80,255,0.12),rgba(14,165,196,0.08));color:var(--brand);}
+[data-theme="light"] .chat-panel{background:#fff;}
+[data-theme="light"] .msg.bot{background:rgba(109,80,255,0.08);}
+[data-theme="light"] .msg.me{background:rgba(14,165,196,0.1);}
+[data-theme="light"] #reportArea{background:#f1f5f9 !important;color:#1e2746 !important;}
+[data-theme="light"] .rc-l1{background:rgba(22,163,74,0.15);color:#166534;}
+[data-theme="light"] .rc-l2{background:rgba(132,204,22,0.2);color:#3f6212;}
+[data-theme="light"] .rc-l3{background:rgba(217,119,6,0.2);color:#92400e;}
+[data-theme="light"] .rc-l4{background:rgba(234,88,12,0.25);color:#9a3412;}
+[data-theme="light"] .rc-l5{background:rgba(220,38,38,0.25);color:#991b1b;}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
+aside{border-right:1px solid var(--panel-border);background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));padding:22px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 6px 18px;border-bottom:1px dashed var(--panel-border);margin-bottom:14px;}
+.logo{width:40px;height:40px;border-radius:12px;background:conic-gradient(from 200deg,#ffcf5c,#7c5cff,#22d3ee,#ffcf5c);display:grid;place-items:center;color:#0b1020;font-weight:800;box-shadow:0 8px 24px rgba(124,92,255,0.35);}
+.brand h1{font-size:16px;letter-spacing:0.5px;}
+.brand small{color:var(--text-2);font-weight:400;font-size:12px;}
+nav a{display:flex;align-items:center;gap:10px;color:var(--text-2);text-decoration:none;padding:10px 12px;border-radius:10px;margin-bottom:4px;font-size:14px;cursor:pointer;user-select:none;transition:all .2s;}
+nav a .dot{width:6px;height:6px;border-radius:50%;background:var(--text-2);}
+nav a:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+nav a.active{background:linear-gradient(90deg,rgba(124,92,255,0.25),rgba(34,211,238,0.15));color:#fff;box-shadow:inset 0 0 0 1px rgba(124,92,255,0.35);}
+nav a.active .dot{background:var(--gold);box-shadow:0 0 8px var(--gold);}
+.side-foot{margin-top:auto;font-size:12px;color:var(--text-2);padding:10px;line-height:1.6;}
+main{padding:20px 28px 80px;max-width:1500px;}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;border:1px solid var(--panel-border);background:var(--panel);border-radius:14px;margin-bottom:18px;backdrop-filter:blur(10px);}
+.search{flex:1;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-border);padding:10px 14px;border-radius:10px;}
+.search input{background:transparent;border:0;outline:0;color:var(--text);width:100%;font-size:14px;}
+.tag{font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(255,207,92,0.12);color:var(--gold);border:1px solid rgba(255,207,92,0.25);}
+.pill{font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(34,211,238,0.1);color:var(--brand-2);border:1px solid rgba(34,211,238,0.25);}
+.page-title{display:flex;align-items:baseline;gap:12px;margin:4px 2px 18px;}
+.page-title h2{font-size:22px;letter-spacing:0.5px;}
+.page-title p{color:var(--text-2);font-size:13px;}
+.grid{display:grid;gap:16px;}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;}
+.card{background:var(--panel);border:1px solid var(--panel-border);border-radius:14px;padding:18px 20px;backdrop-filter:blur(8px);position:relative;overflow:hidden;transition:transform .2s, box-shadow .2s;}
+.card.k{padding:20px 22px 18px;min-height:112px;display:flex;flex-direction:column;justify-content:center;}
+.card.k:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(124,92,255,0.15);}
+.card .title{color:var(--text-2);font-size:12px;letter-spacing:0.4px;line-height:1.4;}
+.card .num{font-size:32px;font-weight:700;margin:10px 0 6px;line-height:1.1;letter-spacing:-0.5px;}
+.card .sub{color:var(--text-2);font-size:12px;line-height:1.5;}
+.card.k::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,var(--gold),var(--brand));}
+.delta-up{color:var(--ok);} .delta-down{color:var(--danger);}
+.row-2{grid-template-columns:1.3fr 1fr;}
+.row-3{grid-template-columns:repeat(3,1fr);}
+.row-2-1{grid-template-columns:2fr 1fr;}
+.chart{height:300px;} .chart-sm{height:240px;}
+h3.section{font-size:15px;letter-spacing:0.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+h3.section::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-gradient(180deg,var(--gold),var(--brand));}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{text-align:left;font-weight:500;color:var(--text-2);padding:10px 12px;border-bottom:1px solid var(--panel-border);font-size:12px;letter-spacing:0.5px;background:rgba(255,255,255,0.02);}
+tbody td{padding:10px 12px;border-bottom:1px dashed var(--panel-border);}
+tbody tr:hover{background:rgba(255,255,255,0.03);}
+.status{font-size:12px;padding:2px 8px;border-radius:999px;display:inline-block;}
+.s-ok{background:rgba(34,197,94,0.12);color:var(--ok);border:1px solid rgba(34,197,94,0.3);}
+.s-wip{background:rgba(34,211,238,0.12);color:var(--brand-2);border:1px solid rgba(34,211,238,0.3);}
+.s-risk{background:rgba(245,158,11,0.14);color:var(--warn);border:1px solid rgba(245,158,11,0.3);}
+.s-block{background:rgba(239,68,68,0.14);color:var(--danger);border:1px solid rgba(239,68,68,0.3);}
+.sev{font-weight:700;font-size:12px;padding:2px 8px;border-radius:6px;}
+.sev-p0{background:#3b0a0a;color:#ff7676;border:1px solid #7f1d1d;}
+.sev-p1{background:#3b2307;color:#ffb454;border:1px solid #92400e;}
+.sev-p2{background:#0c2d3b;color:#7dd3fc;border:1px solid #0e7490;}
+.sev-p3{background:#132338;color:#93a3c9;border:1px solid #334155;}
+section.page{display:none;}
+section.page.active{display:block;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--brand),var(--brand-2),transparent);}
+.tl-item{position:relative;padding:8px 0 16px;}
+.tl-item::before{content:"";position:absolute;left:-20px;top:12px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--brand-2);box-shadow:0 0 0 3px rgba(34,211,238,0.15);}
+.tl-item.done::before{border-color:var(--ok);box-shadow:0 0 0 3px rgba(34,197,94,0.15);}
+.tl-item.risk::before{border-color:var(--warn);box-shadow:0 0 0 3px rgba(245,158,11,0.15);}
+.tl-date{font-size:12px;color:var(--text-2);}
+.tl-title{font-weight:600;margin:2px 0 4px;}
+.tl-desc{color:var(--text-2);font-size:13px;line-height:1.6;}
+.risk-card{padding:14px;border-radius:12px;border:1px solid var(--panel-border);background:rgba(255,255,255,0.03);}
+.risk-card .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.risk-card h4{font-size:14px;}
+.risk-matrix{display:grid;grid-template-columns:80px repeat(5,1fr);gap:6px;background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;}
+.risk-matrix .rc{height:42px;border-radius:6px;display:grid;place-items:center;font-size:12px;border:1px solid var(--panel-border);}
+.rc-h{color:var(--text-2);background:transparent;border:0;}
+.rc-l1{background:rgba(34,197,94,0.15);color:#bbf7d0;}
+.rc-l2{background:rgba(163,230,53,0.15);color:#ecfccb;}
+.rc-l3{background:rgba(245,158,11,0.2);color:#fde68a;}
+.rc-l4{background:rgba(249,115,22,0.25);color:#fed7aa;}
+.rc-l5{background:rgba(239,68,68,0.3);color:#fecaca;}
+.fab{position:fixed;right:24px;bottom:24px;z-index:50;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border:none;padding:12px 18px;border-radius:999px;font-weight:600;letter-spacing:0.5px;cursor:pointer;box-shadow:0 10px 30px rgba(124,92,255,0.45);}
+.chat-panel{position:fixed;right:24px;bottom:84px;width:380px;max-height:70vh;background:var(--panel-solid);border:1px solid var(--panel-border);border-radius:14px;display:none;flex-direction:column;overflow:hidden;z-index:50;box-shadow:0 30px 60px rgba(0,0,0,0.5);}
+.chat-panel.open{display:flex;}
+.chat-head{padding:12px 14px;border-bottom:1px solid var(--panel-border);display:flex;align-items:center;gap:10px;}
+.chat-body{padding:14px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:10px;}
+.msg{padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.55;max-width:92%;}
+.msg.bot{background:rgba(124,92,255,0.12);border:1px solid rgba(124,92,255,0.3);align-self:flex-start;}
+.msg.me{background:rgba(34,211,238,0.12);border:1px solid rgba(34,211,238,0.3);align-self:flex-end;}
+.chat-foot{border-top:1px solid var(--panel-border);padding:10px;display:flex;gap:8px;}
+.chat-foot input{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--panel-border);color:var(--text);padding:10px;border-radius:8px;outline:none;}
+.chat-foot button{background:var(--brand);color:#fff;border:0;padding:0 14px;border-radius:8px;cursor:pointer;}
+.suggest{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px;}
+.suggest span{font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-border);cursor:pointer;color:var(--text-2);}
+.suggest span:hover{color:var(--text);border-color:var(--brand);}
+.muted{color:var(--text-2);}
+.flex-between{display:flex;justify-content:space-between;align-items:center;}
+.mt-10{margin-top:10px;}.mt-14{margin-top:14px;}.mb-10{margin-bottom:10px;}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.btn{background:rgba(255,255,255,0.04);border:1px solid var(--panel-border);color:var(--text);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;}
+.btn:hover{border-color:var(--brand);}
+.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));border:0;color:#fff;}
+.btn.primary:hover{filter:brightness(1.1);}
+/* 主题切换按钮 */
+.theme-switch{display:inline-flex;background:rgba(255,255,255,0.04);border:1px solid var(--panel-border);border-radius:999px;padding:3px;gap:2px;}
+.theme-switch button{background:transparent;border:0;color:var(--text-2);padding:5px 12px;border-radius:999px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:4px;transition:all .2s;}
+.theme-switch button.active{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;box-shadow:0 2px 8px rgba(124,92,255,0.3);}
+[data-theme="light"] .theme-switch{background:#f4f6fb;}
+/* Modal */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal-mask.open{display:flex;animation:fade .2s ease;}
+.modal{background:var(--panel-solid);border:1px solid var(--panel-border);border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow:auto;padding:28px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:0;background:var(--panel);color:var(--text);cursor:pointer;font-size:16px;}
+.modal h3{font-size:18px;margin-bottom:8px;}
+.modal .tool-icon{width:64px;height:64px;border-radius:16px;font-size:32px;margin-bottom:14px;}
+.modal-body{margin-top:14px;}
+.modal-body h5{font-size:13px;color:var(--text-2);margin-bottom:6px;letter-spacing:0.3px;}
+.modal-body ul{margin:6px 0 14px 18px;font-size:13px;line-height:1.9;color:var(--text);}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-thumb{background:var(--scroll-thumb);border-radius:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+@media (max-width:1100px){
+  .app{grid-template-columns:1fr;}
+  aside{position:relative;height:auto;display:flex;flex-direction:row;overflow-x:auto;gap:6px;padding:12px;}
+  nav{display:flex;gap:6px;}
+  .brand{border:0;margin:0 10px 0 0;padding:0;}
+  .side-foot{display:none;}
+  .kpis{grid-template-columns:repeat(2,1fr);}
+  .row-2,.row-3,.row-2-1{grid-template-columns:1fr;}
+  .chat-panel{right:12px;left:12px;width:auto;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand">
+    <div class="logo">金</div>
+    <div><h1>AI助手 · 小金</h1><small>PM 日常管理</small></div>
+  </div>
+  <nav id="nav">
+    <a class="active" data-page="overview"><span class="dot"></span>总览看板</a>
+    <a data-page="demand"><span class="dot"></span>研发需求管理</a>
+    <a data-page="bug"><span class="dot"></span>Bug 质量管理</a>
+    <a data-page="milestone"><span class="dot"></span>版本节点 / 里程碑</a>
+    <a data-page="risk"><span class="dot"></span>风险识别</a>
+    <a data-page="report"><span class="dot"></span>日报 / 双周报 / 例会</a>
+  </nav>
+  <div class="side-foot">
+    <div>数据窗口：<b>2026-03-20 ~ 04-20</b></div>
+    <div>示例数据（虚构脱敏），用于展示 PM 管理视图。</div>
+    <div style="margin-top:8px;">v1.0 · 单文件离线可用</div>
+  </div>
+</aside>
+
+<main>
+  <header class="top">
+    <div class="search"><span>🔍</span><input id="globalSearch" placeholder="搜索需求 / Bug / 里程碑 / 风险…"/></div>
+    <div class="toolbar">
+      <span class="pill">周期：近 30 天</span>
+      <span class="tag">示例数据 · 可公开</span>
+      <div class="theme-switch" id="themeSwitch">
+        <button data-theme-btn="dark" class="active" title="深色模式">🌙 深色</button>
+        <button data-theme-btn="light" title="浅色模式">☀️ 浅色</button>
+      </div>
+      <button class="btn" onclick="exportJSON()">导出数据仓库</button>
+    </div>
+  </header>
+
+  <!-- 总览 -->
+  <section class="page active" id="page-overview">
+    <div class="page-title"><h2>总览看板</h2><p>一屏掌握：需求吞吐、质量水位、里程碑推进与风险态势。</p></div>
+    <div class="grid kpis">
+      <div class="card k"><div class="title">进行中需求</div><div class="num" id="kpi-demand">—</div><div class="sub">本期交付率 <span class="delta-up" id="kpi-demand-rate">—</span></div></div>
+      <div class="card k"><div class="title">活跃 Bug</div><div class="num" id="kpi-bug">—</div><div class="sub">P0/P1 存量 <span class="delta-down" id="kpi-bug-p01">—</span></div></div>
+      <div class="card k"><div class="title">里程碑完成</div><div class="num" id="kpi-ms">—</div><div class="sub">按时达成 <span class="delta-up" id="kpi-ms-rate">—</span></div></div>
+      <div class="card k"><div class="title">高风险项</div><div class="num" id="kpi-risk">—</div><div class="sub">已升级处理 <span class="delta-up" id="kpi-risk-handled">—</span></div></div>
+    </div>
+    <div class="grid row-2 mt-14">
+      <div class="card"><h3 class="section">需求 vs Bug 日趋势（0320 - 0420）</h3><div id="chartTrend" class="chart"></div></div>
+      <div class="card"><h3 class="section">当前 Bug 优先级分布</h3><div id="chartBugPie" class="chart"></div></div>
+    </div>
+    <div class="grid row-3 mt-14">
+      <div class="card"><h3 class="section">研发模块负载</h3><div id="chartLoad" class="chart-sm"></div></div>
+      <div class="card"><h3 class="section">里程碑达成率</h3><div id="chartMs" class="chart-sm"></div></div>
+      <div class="card"><h3 class="section">风险等级雷达</h3><div id="chartRadar" class="chart-sm"></div></div>
+    </div>
+  </section>
+
+  <!-- 需求 -->
+  <section class="page" id="page-demand">
+    <div class="page-title"><h2>研发需求管理</h2><p>需求状态分布、负责人分布、延期预警与明细列表。</p></div>
+    <div class="grid kpis">
+      <div class="card k"><div class="title">总需求数</div><div class="num" id="d-total">—</div><div class="sub">较上期 <span class="delta-up">+12</span></div></div>
+      <div class="card k"><div class="title">本期已交付</div><div class="num" id="d-done">—</div><div class="sub">交付率 <span class="delta-up" id="d-rate">—</span></div></div>
+      <div class="card k"><div class="title">进行中</div><div class="num" id="d-wip">—</div><div class="sub">平均进度 <span id="d-avg">—</span></div></div>
+      <div class="card k"><div class="title">延期风险</div><div class="num" id="d-risk">—</div><div class="sub">需关注 <span class="delta-down" id="d-risk-rate">—</span></div></div>
+    </div>
+    <div class="grid row-2 mt-14">
+      <div class="card"><h3 class="section">需求状态分布</h3><div id="chartDemandStatus" class="chart"></div></div>
+      <div class="card"><h3 class="section">负责人工作量（TOP）</h3><div id="chartOwner" class="chart"></div></div>
+    </div>
+    <div class="card mt-14">
+      <div class="flex-between mb-10"><h3 class="section">需求明细</h3>
+        <div class="toolbar">
+          <select class="btn" id="demandFilter"><option value="">全部状态</option><option>待开发</option><option>开发中</option><option>测试中</option><option>已上线</option><option>延期风险</option></select>
+          <input class="btn" id="demandSearch" placeholder="搜索需求..." style="min-width:200px"/>
+        </div>
+      </div>
+      <div style="max-height:420px;overflow:auto;">
+        <table id="demandTable"><thead><tr><th>编号</th><th>需求</th><th>模块</th><th>负责人</th><th>优先级</th><th>进度</th><th>预计交付</th><th>状态</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bug -->
+  <section class="page" id="page-bug">
+    <div class="page-title"><h2>Bug 质量管理</h2><p>缺陷趋势、等级分布、模块热区与存量明细，辅助 PM 把控版本质量水位。</p></div>
+    <div class="grid kpis">
+      <div class="card k"><div class="title">期内新增 Bug</div><div class="num" id="b-new">—</div><div class="sub">日均 <span id="b-avg">—</span></div></div>
+      <div class="card k"><div class="title">已关闭 Bug</div><div class="num" id="b-closed">—</div><div class="sub">关闭率 <span class="delta-up" id="b-close-rate">—</span></div></div>
+      <div class="card k"><div class="title">P0 / P1 存量</div><div class="num" id="b-p01">—</div><div class="sub">需 24h 内处理</div></div>
+      <div class="card k"><div class="title">平均解决时长</div><div class="num" id="b-ttr">—</div><div class="sub">较上期 <span class="delta-up">-8%</span></div></div>
+    </div>
+    <div class="grid row-2 mt-14">
+      <div class="card"><h3 class="section">Bug 新增/关闭日趋势</h3><div id="chartBugTrend" class="chart"></div></div>
+      <div class="card"><h3 class="section">模块缺陷热力</h3><div id="chartBugModule" class="chart"></div></div>
+    </div>
+    <div class="card mt-14">
+      <div class="flex-between mb-10"><h3 class="section">活跃 Bug 明细</h3>
+        <div class="toolbar">
+          <select class="btn" id="bugFilter"><option value="">全部等级</option><option>P0</option><option>P1</option><option>P2</option><option>P3</option></select>
+          <input class="btn" id="bugSearch" placeholder="搜索Bug..." style="min-width:200px"/>
+        </div>
+      </div>
+      <div style="max-height:420px;overflow:auto;">
+        <table id="bugTable"><thead><tr><th>ID</th><th>标题</th><th>等级</th><th>模块</th><th>发现日期</th><th>负责人</th><th>停留天数</th><th>状态</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 里程碑 -->
+  <section class="page" id="page-milestone">
+    <div class="page-title"><h2>版本节点与里程碑管理</h2><p>版本周期视图 + 关键里程碑时间轴，一眼掌握进度水位。</p></div>
+    <div class="grid row-2-1">
+      <div class="card"><h3 class="section">版本甘特视图</h3><div id="chartGantt" style="height:360px;"></div></div>
+      <div class="card"><h3 class="section">里程碑清单</h3><div class="timeline" id="timeline"></div></div>
+    </div>
+    <div class="card mt-14"><h3 class="section">版本发布计划</h3>
+      <table id="msTable"><thead><tr><th>版本</th><th>代号</th><th>计划日期</th><th>负责人</th><th>关键产出</th><th>进度</th><th>状态</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <!-- 风险 -->
+  <section class="page" id="page-risk">
+    <div class="page-title"><h2>风险识别</h2><p>结合需求 / Bug / 里程碑数据，自动识别并分级呈现风险项。</p></div>
+    <div class="grid row-2 mt-14">
+      <div class="card"><h3 class="section">风险矩阵（影响 × 概率）</h3><div class="risk-matrix" id="riskMatrix"></div><div class="muted mt-10" style="font-size:12px;">颜色越深风险越高；格子内为当前风险项数量。</div></div>
+      <div class="card"><h3 class="section">风险分类雷达</h3><div id="chartRiskRadar" class="chart"></div></div>
+    </div>
+    <div class="grid row-2 mt-14" id="riskList"></div>
+  </section>
+
+  <!-- 报告 -->
+  <section class="page" id="page-report">
+    <div class="page-title"><h2>日报 / 双周报 / 例会管理</h2><p>一键生成 PM 日报、双周报、例会纪要草稿。</p></div>
+    <div class="grid row-3">
+      <div class="card"><h3 class="section">日报生成</h3><div class="muted" style="font-size:13px;margin-bottom:10px;">整合今日进度、完成项、阻塞项。</div><button class="btn primary" onclick="genReport('daily')">生成今日日报</button></div>
+      <div class="card"><h3 class="section">双周报生成</h3><div class="muted" style="font-size:13px;margin-bottom:10px;">双周视角汇总需求交付、质量水位、风险。</div><button class="btn primary" onclick="genReport('biweekly')">生成双周报</button></div>
+      <div class="card"><h3 class="section">例会纪要</h3><div class="muted" style="font-size:13px;margin-bottom:10px;">生成结构化例会议程。</div><button class="btn primary" onclick="genReport('meeting')">生成例会议程</button></div>
+    </div>
+    <div class="card mt-14">
+      <div class="flex-between mb-10"><h3 class="section">报告预览</h3>
+        <div class="toolbar"><button class="btn" onclick="copyReport()">复制</button><button class="btn" onclick="downloadReport()">下载 Markdown</button></div>
+      </div>
+      <pre id="reportArea" style="white-space:pre-wrap;background:rgba(0,0,0,0.25);padding:16px;border-radius:10px;font-size:13px;color:#cfd6f5;min-height:220px;line-height:1.7;">点击上方按钮生成报告…</pre>
+    </div>
+    <div class="card mt-14"><h3 class="section">历史报告</h3>
+      <table id="reportHistory"><thead><tr><th>日期</th><th>类型</th><th>关键主题</th><th>状态</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+</main>
+</div>
+
+<button class="fab" onclick="toggleChat()">💬 问小金</button>
+<div class="chat-panel" id="chat">
+  <div class="chat-head">
+    <div class="logo" style="width:28px;height:28px;border-radius:8px;font-size:12px;">金</div>
+    <div><div style="font-weight:600;">小金 · AI 问答</div><div class="muted" style="font-size:12px;">基于本地数据仓库回答（示例）</div></div>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="msg bot">你好，我是小金 👋 可以问我关于需求、Bug、里程碑、风险的问题，例如：<br>• "当前还有多少 P0 Bug？"<br>• "延期风险的需求有哪些？"<br>• "帮我生成一份今日日报。"</div>
+  </div>
+  <div class="suggest">
+    <span onclick="ask('当前P0/P1 Bug有多少？')">P0/P1 Bug 存量</span>
+    <span onclick="ask('有哪些延期风险的需求？')">延期风险</span>
+    <span onclick="ask('近一个月交付率是多少？')">交付率</span>
+    <span onclick="ask('生成今日日报')">生成日报</span>
+  </div>
+  <div class="chat-foot">
+    <input id="chatInput" placeholder="向小金提问..." onkeydown="if(event.key==='Enter') sendChat()"/>
+    <button onclick="sendChat()">发送</button>
+  </div>
+</div>
+
+<script>
+/* ====== 数据仓库（虚构脱敏示例） ====== */
+function generateDaily(){
+  const start = new Date("2026-03-20");
+  const arr = [];
+  const seed = (n) => (Math.sin(n*1.7)+1)/2;
+  for(let i=0;i<32;i++){
+    const d = new Date(start); d.setDate(start.getDate()+i);
+    const day = d.toISOString().slice(5,10);
+    arr.push({
+      date:day,
+      demandNew : Math.round(3 + seed(i)*5 + (i%7===0?2:0)),
+      demandDone: Math.round(2 + seed(i+2)*5),
+      bugNew    : Math.round(6 + seed(i+4)*8 + (i>20?3:0)),
+      bugClosed : Math.round(5 + seed(i+6)*8)
+    });
+  }
+  return arr;
+}
+const DATA = {
+  meta:{ window:["2026-03-20","2026-04-20"], product:"示例产品（代号：星辰计划）", note:"虚构数据，用于展示 PM 管理驾驶舱能力。" },
+  demands:[
+    {id:"REQ-1001",title:"登录模块统一改造",module:"账号",owner:"小A",priority:"高",progress:100,due:"2026-03-28",status:"已上线"},
+    {id:"REQ-1002",title:"首页瀑布流性能优化",module:"首页",owner:"小B",priority:"高",progress:85,due:"2026-04-22",status:"测试中"},
+    {id:"REQ-1003",title:"个人中心积分体系升级",module:"用户",owner:"小C",priority:"中",progress:60,due:"2026-04-26",status:"开发中"},
+    {id:"REQ-1004",title:"搜索推荐算法迭代 v2",module:"搜索",owner:"小D",priority:"高",progress:45,due:"2026-04-25",status:"开发中"},
+    {id:"REQ-1005",title:"活动中心模板化",module:"活动",owner:"小E",priority:"中",progress:100,due:"2026-04-05",status:"已上线"},
+    {id:"REQ-1006",title:"消息中心异步化改造",module:"消息",owner:"小F",priority:"中",progress:20,due:"2026-05-08",status:"待开发"},
+    {id:"REQ-1007",title:"播放器 HDR 支持",module:"播放",owner:"小G",priority:"低",progress:35,due:"2026-05-10",status:"开发中"},
+    {id:"REQ-1008",title:"支付通道容灾方案",module:"支付",owner:"小H",priority:"高",progress:70,due:"2026-04-30",status:"开发中"},
+    {id:"REQ-1009",title:"会员中心订阅链路",module:"会员",owner:"小A",priority:"高",progress:55,due:"2026-04-21",status:"延期风险"},
+    {id:"REQ-1010",title:"评论系统反垃圾策略",module:"社区",owner:"小I",priority:"中",progress:78,due:"2026-04-24",status:"测试中"},
+    {id:"REQ-1011",title:"新手引导流程重构",module:"成长",owner:"小J",priority:"中",progress:100,due:"2026-04-02",status:"已上线"},
+    {id:"REQ-1012",title:"埋点规范 v3 落地",module:"数据",owner:"小K",priority:"中",progress:50,due:"2026-05-04",status:"开发中"},
+    {id:"REQ-1013",title:"夜间模式适配",module:"客户端",owner:"小B",priority:"低",progress:90,due:"2026-04-19",status:"测试中"},
+    {id:"REQ-1014",title:"推送分群精细化",module:"增长",owner:"小L",priority:"中",progress:40,due:"2026-04-27",status:"延期风险"},
+    {id:"REQ-1015",title:"客户端包体积瘦身",module:"客户端",owner:"小M",priority:"中",progress:65,due:"2026-05-02",status:"开发中"},
+    {id:"REQ-1016",title:"IM 消息已读回执",module:"IM",owner:"小F",priority:"低",progress:25,due:"2026-05-15",status:"待开发"},
+    {id:"REQ-1017",title:"内容审核模型升级",module:"内容",owner:"小N",priority:"高",progress:100,due:"2026-04-10",status:"已上线"},
+    {id:"REQ-1018",title:"广告 SDK 多渠道接入",module:"商业",owner:"小O",priority:"中",progress:30,due:"2026-05-06",status:"开发中"},
+    {id:"REQ-1019",title:"客户端崩溃率专项",module:"稳定性",owner:"小P",priority:"高",progress:80,due:"2026-04-23",status:"测试中"},
+    {id:"REQ-1020",title:"A/B 实验平台升级",module:"实验",owner:"小K",priority:"中",progress:100,due:"2026-04-08",status:"已上线"},
+    {id:"REQ-1021",title:"隐私合规弹窗统一",module:"合规",owner:"小Q",priority:"高",progress:95,due:"2026-04-20",status:"测试中"},
+    {id:"REQ-1022",title:"图片压缩链路升级",module:"媒体",owner:"小G",priority:"低",progress:15,due:"2026-05-18",status:"待开发"}
+  ],
+  bugs:[
+    {id:"BUG-2001",title:"低端机首页白屏",sev:"P0",module:"首页",found:"2026-04-15",owner:"小B",age:5,status:"处理中"},
+    {id:"BUG-2002",title:"登录回调偶现失败",sev:"P0",module:"账号",found:"2026-04-10",owner:"小A",age:10,status:"处理中"},
+    {id:"BUG-2003",title:"支付页面返回无 toast",sev:"P2",module:"支付",found:"2026-03-22",owner:"小H",age:29,status:"处理中"},
+    {id:"BUG-2004",title:"搜索空结果样式错乱",sev:"P2",module:"搜索",found:"2026-04-02",owner:"小D",age:18,status:"处理中"},
+    {id:"BUG-2005",title:"评论发布偶现重复提交",sev:"P1",module:"社区",found:"2026-04-12",owner:"小I",age:8,status:"处理中"},
+    {id:"BUG-2006",title:"播放器横屏旋转黑屏",sev:"P1",module:"播放",found:"2026-04-05",owner:"小G",age:15,status:"处理中"},
+    {id:"BUG-2007",title:"推送落地页跳转 404",sev:"P1",module:"增长",found:"2026-04-14",owner:"小L",age:6,status:"处理中"},
+    {id:"BUG-2008",title:"夜间模式按钮色差",sev:"P3",module:"客户端",found:"2026-04-08",owner:"小B",age:12,status:"处理中"},
+    {id:"BUG-2009",title:"埋点丢失：首页曝光",sev:"P1",module:"数据",found:"2026-04-09",owner:"小K",age:11,status:"处理中"},
+    {id:"BUG-2010",title:"包体积白名单误杀",sev:"P2",module:"客户端",found:"2026-04-11",owner:"小M",age:9,status:"处理中"},
+    {id:"BUG-2011",title:"IM 已读状态偶现不同步",sev:"P1",module:"IM",found:"2026-04-13",owner:"小F",age:7,status:"处理中"},
+    {id:"BUG-2012",title:"活动中心图片加载慢",sev:"P2",module:"活动",found:"2026-03-28",owner:"小E",age:23,status:"处理中"},
+    {id:"BUG-2013",title:"会员续费弹窗闪退",sev:"P0",module:"会员",found:"2026-04-17",owner:"小A",age:3,status:"新提交"},
+    {id:"BUG-2014",title:"广告 SDK 初始化失败",sev:"P1",module:"商业",found:"2026-04-16",owner:"小O",age:4,status:"处理中"},
+    {id:"BUG-2015",title:"隐私弹窗文案错位",sev:"P3",module:"合规",found:"2026-04-03",owner:"小Q",age:17,status:"处理中"},
+    {id:"BUG-2016",title:"图片压缩导致模糊",sev:"P2",module:"媒体",found:"2026-04-06",owner:"小G",age:14,status:"处理中"},
+    {id:"BUG-2017",title:"AB 实验分流偶现错误",sev:"P1",module:"实验",found:"2026-04-11",owner:"小K",age:9,status:"处理中"}
+  ],
+  daily:generateDaily(),
+  milestones:[
+    {ver:"v7.12.0",code:"春潮",date:"2026-03-25",owner:"小A",deliver:"登录统一改造 / 活动模板化",progress:100,status:"已发布"},
+    {ver:"v7.13.0",code:"银河",date:"2026-04-10",owner:"小B",deliver:"新手引导 / 内容审核升级",progress:100,status:"已发布"},
+    {ver:"v7.14.0",code:"极光",date:"2026-04-24",owner:"小C",deliver:"首页性能 / 会员订阅",progress:70,status:"测试中"},
+    {ver:"v7.15.0",code:"星轨",date:"2026-05-08",owner:"小D",deliver:"搜索推荐 / 支付容灾",progress:35,status:"开发中"},
+    {ver:"v7.16.0",code:"星海",date:"2026-05-22",owner:"小E",deliver:"广告 SDK / 消息异步化",progress:10,status:"规划中"}
+  ],
+  risks:[
+    {id:"R-001",title:"v7.14.0 首页性能优化存在延期可能",cat:"进度",impact:4,prob:3,owner:"小B",mitigation:"拆分收敛范围，高优先级先上，次要项挪至 v7.15",status:"进行中"},
+    {id:"R-002",title:"会员订阅链路第三方依赖未完成联调",cat:"依赖",impact:5,prob:3,owner:"小A",mitigation:"Plan B：先上基础订阅，续费功能分批发布",status:"已升级"},
+    {id:"R-003",title:"P0 Bug 存量偏高（3 个）",cat:"质量",impact:5,prob:4,owner:"QA团队",mitigation:"设置 24h SLA，每日晨会同步；阻塞发布",status:"已升级"},
+    {id:"R-004",title:"搜索推荐 v2 模型效果不达预期",cat:"效果",impact:3,prob:3,owner:"小D",mitigation:"提前灰度 5% + 关键指标守门，不达标回滚",status:"监控中"},
+    {id:"R-005",title:"隐私弹窗合规节点紧",cat:"合规",impact:5,prob:2,owner:"小Q",mitigation:"提前 3 天冻结需求，法务评审前置",status:"进行中"},
+    {id:"R-006",title:"客户端崩溃率 > 目标阈值",cat:"稳定性",impact:4,prob:2,owner:"小P",mitigation:"专项排查 Top5 堆栈，热修通道待命",status:"监控中"},
+    {id:"R-007",title:"测试人力在 v7.14 与 v7.15 叠加",cat:"资源",impact:3,prob:4,owner:"QA团队",mitigation:"优先级排序，低优需求改自动化回归",status:"进行中"},
+    {id:"R-008",title:"广告 SDK 多渠道接入排期紧",cat:"进度",impact:3,prob:3,owner:"小O",mitigation:"先接入 2 家渠道上线，其余 v7.16 承载",status:"监控中"}
+  ],
+  reportHistory:[
+    {date:"2026-04-20",type:"日报",topic:"P0 Bug 攻坚 / 首页性能进入灰度",status:"已发送"},
+    {date:"2026-04-18",type:"双周报",topic:"v7.13 发布回顾 & v7.14 冲刺启动",status:"已发送"},
+    {date:"2026-04-17",type:"例会纪要",topic:"风险升级：会员订阅依赖 / 测试人力叠加",status:"已发送"},
+    {date:"2026-04-15",type:"日报",topic:"Android 低端机白屏紧急处置",status:"已发送"},
+    {date:"2026-04-10",type:"版本报告",topic:"v7.13.0 银河 上线回顾",status:"已发送"},
+    {date:"2026-04-04",type:"双周报",topic:"春潮版本全量 & 银河冲刺",status:"已发送"},
+    {date:"2026-03-25",type:"版本报告",topic:"v7.12.0 春潮 上线回顾",status:"已发送"}
+  ]
+};
+</script>
+<script>
+/* ====== 应用逻辑 ====== */
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+/* ========== localStorage 数据合并（管理员端可更新） ========== */
+/* ========== localStorage 数据合并（管理员端可更新） ========== */
+(function mergeAdminData(){
+  try{
+    const saved = localStorage.getItem('xiaojin-data');
+    if(saved){
+      const obj = JSON.parse(saved);
+      if(obj && typeof obj==='object'){
+        ['demands','bugs','milestones','risks','reportHistory','meta'].forEach(k=>{
+          if(obj[k]!==undefined) DATA[k]=obj[k];
+        });
+      }
+    }
+  }catch(e){ console.warn('[xiaojin] admin data parse failed', e); }
+})();
+
+/* ========== 主题切换 ========== */
+function getThemeVars(){
+  const cs = getComputedStyle(document.documentElement);
+  return {
+    axisColor: cs.getPropertyValue('--chart-axis').trim() || '#2a3460',
+    labelColor: cs.getPropertyValue('--chart-label').trim() || '#9aa5c9',
+    splitColor: cs.getPropertyValue('--chart-split').trim() || 'rgba(255,255,255,0.05)',
+    textColor: cs.getPropertyValue('--text').trim() || '#e6ebff'
+  };
+}
+function buildAxisStyle(){
+  const v = getThemeVars();
+  return { axisLine:{lineStyle:{color:v.axisColor}}, axisLabel:{color:v.labelColor}, splitLine:{lineStyle:{color:v.splitColor}} };
+}
+function buildLegendStyle(){ return { textStyle:{color:getThemeVars().textColor}, top:6 }; }
+let axisStyle = buildAxisStyle();
+let legendStyle = buildLegendStyle();
+
+function setTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('xiaojin-theme', theme);
+  $$('#themeSwitch button').forEach(b=>b.classList.toggle('active', b.dataset.themeBtn===theme));
+  axisStyle = buildAxisStyle();
+  legendStyle = buildLegendStyle();
+  // 重绘图表
+  if(window.__xjBooted) reRenderAllCharts();
+}
+(function initTheme(){
+  const saved = localStorage.getItem('xiaojin-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+
+$$('#nav a').forEach(a=>{
+  a.addEventListener('click', ()=>{
+    $$('#nav a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    const page = a.dataset.page;
+    $$('.page').forEach(p=>p.classList.remove('active'));
+    $('#page-'+page).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+    setTimeout(()=>window.dispatchEvent(new Event('resize')), 60);
+  });
+});
+
+function renderKPIs(){
+  const d=DATA.demands,bugs=DATA.bugs,ms=DATA.milestones;
+  const demandWip=d.filter(x=>['开发中','测试中','待开发','延期风险'].includes(x.status)).length;
+  const demandDone=d.filter(x=>x.status==='已上线').length;
+  const demandRate=Math.round(demandDone/d.length*100);
+  const demandRisk=d.filter(x=>x.status==='延期风险').length;
+  const p01=bugs.filter(b=>b.sev==='P0'||b.sev==='P1').length;
+  const msDone=ms.filter(m=>m.status==='已发布').length;
+  const msRate=Math.round(msDone/ms.length*100);
+  const riskHigh=DATA.risks.filter(r=>r.impact*r.prob>=12).length;
+  const riskHandled=DATA.risks.filter(r=>['已升级','进行中'].includes(r.status)).length;
+  $('#kpi-demand').textContent=demandWip;
+  $('#kpi-demand-rate').textContent=demandRate+'%';
+  $('#kpi-bug').textContent=bugs.length;
+  $('#kpi-bug-p01').textContent=p01+' 个';
+  $('#kpi-ms').textContent=msDone+' / '+ms.length;
+  $('#kpi-ms-rate').textContent=msRate+'%';
+  $('#kpi-risk').textContent=riskHigh;
+  $('#kpi-risk-handled').textContent=riskHandled+' 项';
+  $('#d-total').textContent=d.length;
+  $('#d-done').textContent=demandDone;
+  $('#d-wip').textContent=d.filter(x=>x.status==='开发中').length;
+  $('#d-rate').textContent=demandRate+'%';
+  const wipList=d.filter(x=>x.status==='开发中');
+  const avg=wipList.length?Math.round(wipList.reduce((a,b)=>a+b.progress,0)/wipList.length):0;
+  $('#d-avg').textContent=avg+'%';
+  $('#d-risk').textContent=demandRisk;
+  $('#d-risk-rate').textContent=Math.round(demandRisk/d.length*100)+'%';
+  const newBugs=DATA.daily.reduce((a,b)=>a+b.bugNew,0);
+  const closedBugs=DATA.daily.reduce((a,b)=>a+b.bugClosed,0);
+  $('#b-new').textContent=newBugs;
+  $('#b-avg').textContent=Math.round(newBugs/DATA.daily.length)+'/日';
+  $('#b-closed').textContent=closedBugs;
+  $('#b-close-rate').textContent=Math.round(closedBugs/newBugs*100)+'%';
+  $('#b-p01').textContent=p01;
+  $('#b-ttr').textContent='2.8 天';
+}
+function ec(id,opt){ const el=document.getElementById(id); if(!el)return null; let inst=echarts.getInstanceByDom(el); if(inst){ inst.dispose(); } inst=echarts.init(el); inst.setOption(opt); window.addEventListener('resize',()=>inst.resize()); return inst; }
+
+function renderOverviewCharts(){
+  const days=DATA.daily.map(x=>x.date);
+  ec('chartTrend',{tooltip:{trigger:'axis'},legend:{...legendStyle,data:['需求完成','Bug 新增','Bug 关闭']},grid:{left:40,right:20,top:40,bottom:30},xAxis:{type:'category',data:days,...axisStyle},yAxis:{type:'value',...axisStyle},series:[
+    {name:'需求完成',type:'line',smooth:true,data:DATA.daily.map(x=>x.demandDone),areaStyle:{color:'rgba(34,211,238,0.15)'},lineStyle:{color:'#22d3ee'},itemStyle:{color:'#22d3ee'}},
+    {name:'Bug 新增',type:'line',smooth:true,data:DATA.daily.map(x=>x.bugNew),lineStyle:{color:'#ef4444'},itemStyle:{color:'#ef4444'}},
+    {name:'Bug 关闭',type:'line',smooth:true,data:DATA.daily.map(x=>x.bugClosed),lineStyle:{color:'#22c55e'},itemStyle:{color:'#22c55e'}}
+  ]});
+  const sev={P0:0,P1:0,P2:0,P3:0}; DATA.bugs.forEach(b=>sev[b.sev]++);
+  ec('chartBugPie',{
+    tooltip:{trigger:'item',formatter:'{b}: {c} ({d}%)'},
+    legend:{orient:'vertical',right:10,top:'center',textStyle:{color:getThemeVars().textColor},itemWidth:10,itemHeight:10},
+    series:[{type:'pie',radius:['48%','72%'],center:['36%','50%'],avoidLabelOverlap:true,
+      label:{show:true,color:getThemeVars().textColor,formatter:'{b}\n{d}%',fontSize:11,lineHeight:16},
+      labelLine:{show:true,length:8,length2:10},
+      data:[
+        {name:'P0',value:sev.P0,itemStyle:{color:'#ef4444'}},
+        {name:'P1',value:sev.P1,itemStyle:{color:'#f59e0b'}},
+        {name:'P2',value:sev.P2,itemStyle:{color:'#22d3ee'}},
+        {name:'P3',value:sev.P3,itemStyle:{color:'#94a3b8'}}
+      ]}]});
+  const modMap={}; DATA.demands.forEach(d=>modMap[d.module]=(modMap[d.module]||0)+1);
+  const mods=Object.entries(modMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  ec('chartLoad',{tooltip:{trigger:'axis'},grid:{left:60,right:20,top:20,bottom:30},xAxis:{type:'value',...axisStyle},yAxis:{type:'category',data:mods.map(x=>x[0]),...axisStyle},series:[{type:'bar',data:mods.map(x=>x[1]),itemStyle:{color:'#7c5cff',borderRadius:[0,4,4,0]}}]});
+  ec('chartMs',{tooltip:{trigger:'item'},series:[{type:'gauge',progress:{show:true,width:16},axisLine:{lineStyle:{width:16,color:[[1,getThemeVars().splitColor]]}},pointer:{show:false},axisTick:{show:false},splitLine:{show:false},axisLabel:{show:false},detail:{valueAnimation:true,formatter:'{value}%',color:getThemeVars().textColor,fontSize:24,offsetCenter:[0,'0%']},data:[{value:Math.round(DATA.milestones.filter(m=>m.status==='已发布').length/DATA.milestones.length*100),itemStyle:{color:'#22d3ee'}}]}]});
+  const catMap={}; DATA.risks.forEach(r=>catMap[r.cat]=(catMap[r.cat]||0)+r.impact*r.prob);
+  const indicator=Object.keys(catMap).map(k=>({name:k,max:25}));
+  ec('chartRadar',{tooltip:{},radar:{indicator,splitLine:{lineStyle:{color:getThemeVars().axisColor}},axisLine:{lineStyle:{color:getThemeVars().axisColor}},splitArea:{show:false},name:{color:getThemeVars().labelColor}},series:[{type:'radar',data:[{value:Object.values(catMap),name:'风险值',areaStyle:{color:'rgba(124,92,255,0.25)'},lineStyle:{color:'#7c5cff'},itemStyle:{color:'#7c5cff'}}]}]});
+}
+
+function renderDemandCharts(){
+  const st={}; DATA.demands.forEach(d=>st[d.status]=(st[d.status]||0)+1);
+  const colorMap={'已上线':'#22c55e','测试中':'#22d3ee','开发中':'#7c5cff','待开发':'#94a3b8','延期风险':'#f59e0b'};
+  ec('chartDemandStatus',{
+    tooltip:{trigger:'item',formatter:'{b}: {c} ({d}%)'},
+    legend:{orient:'vertical',right:10,top:'center',textStyle:{color:getThemeVars().textColor},itemWidth:10,itemHeight:10},
+    series:[{type:'pie',radius:['42%','68%'],center:['36%','50%'],avoidLabelOverlap:true,
+      label:{show:true,color:getThemeVars().textColor,formatter:'{b}\n{d}%',fontSize:11,lineHeight:16},
+      labelLine:{show:true,length:8,length2:10},
+      data:Object.entries(st).map(([k,v])=>({name:k,value:v,itemStyle:{color:colorMap[k]||'#888'}}))}]
+  });
+  const own={}; DATA.demands.forEach(d=>own[d.owner]=(own[d.owner]||0)+1);
+  const owners=Object.entries(own).sort((a,b)=>b[1]-a[1]);
+  ec('chartOwner',{tooltip:{trigger:'axis'},grid:{left:40,right:20,top:20,bottom:40},xAxis:{type:'category',data:owners.map(x=>x[0]),...axisStyle},yAxis:{type:'value',...axisStyle},series:[{type:'bar',data:owners.map(x=>x[1]),itemStyle:{color:'#22d3ee',borderRadius:[6,6,0,0]}}]});
+}
+
+function renderBugCharts(){
+  const days=DATA.daily.map(x=>x.date);
+  ec('chartBugTrend',{tooltip:{trigger:'axis'},legend:{...legendStyle,data:['新增','关闭']},grid:{left:40,right:20,top:40,bottom:30},xAxis:{type:'category',data:days,...axisStyle},yAxis:{type:'value',...axisStyle},series:[
+    {name:'新增',type:'bar',data:DATA.daily.map(x=>x.bugNew),itemStyle:{color:'#ef4444',borderRadius:[4,4,0,0]}},
+    {name:'关闭',type:'bar',data:DATA.daily.map(x=>x.bugClosed),itemStyle:{color:'#22c55e',borderRadius:[4,4,0,0]}}
+  ]});
+  const mm={}; DATA.bugs.forEach(b=>mm[b.module]=(mm[b.module]||0)+1);
+  const mods=Object.entries(mm).sort((a,b)=>b[1]-a[1]);
+  ec('chartBugModule',{tooltip:{trigger:'axis'},grid:{left:70,right:20,top:20,bottom:30},xAxis:{type:'value',...axisStyle},yAxis:{type:'category',data:mods.map(x=>x[0]),...axisStyle},series:[{type:'bar',data:mods.map(x=>x[1]),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#7c5cff'},{offset:1,color:'#ef4444'}]),borderRadius:[0,4,4,0]}}]});
+}
+
+function renderGantt(){
+  const data=DATA.milestones.map((m,idx)=>{ const start=new Date(m.date); const from=new Date(start); from.setDate(start.getDate()-14); return {name:m.ver+' '+m.code,value:[idx,from.getTime(),start.getTime(),m.progress,m.status]}; });
+  const colorByStatus={'已发布':'#22c55e','测试中':'#22d3ee','开发中':'#7c5cff','规划中':'#94a3b8'};
+  ec('chartGantt',{
+    tooltip:{formatter:(p)=>{const d=p.data.value,m=DATA.milestones[d[0]]; return `<b>${m.ver} · ${m.code}</b><br>交付：${m.deliver}<br>负责人：${m.owner}<br>进度：${m.progress}% · ${m.status}`;}},
+    grid:{left:110,right:40,top:30,bottom:30},
+    xAxis:{type:'time',...axisStyle},
+    yAxis:{type:'category',data:DATA.milestones.map(m=>m.ver+' '+m.code),...axisStyle},
+    series:[{type:'custom',renderItem:(params,api)=>{
+      const cat=api.value(0); const start=api.coord([api.value(1),cat]); const end=api.coord([api.value(2),cat]);
+      const height=18; const progress=api.value(3); const status=api.value(4);
+      const color=colorByStatus[status]||'#7c5cff'; const width=end[0]-start[0];
+      return {type:'group',children:[
+        {type:'rect',shape:{x:start[0],y:start[1]-height/2,width:width,height:height,r:4},style:{fill:'rgba(124,92,255,0.12)'}},
+        {type:'rect',shape:{x:start[0],y:start[1]-height/2,width:width*progress/100,height:height,r:4},style:{fill:color}},
+        {type:'text',style:{text:progress+'%',x:end[0]+8,y:start[1]+4,fill:getThemeVars().textColor,font:'12px sans-serif'}}
+      ]};
+    },encode:{x:[1,2],y:0},data}]
+  });
+}
+
+function renderTimeline(){
+  const tl=$('#timeline'); tl.innerHTML='';
+  DATA.milestones.forEach(m=>{
+    const cls=m.status==='已发布'?'done':(m.status==='测试中'?'risk':'');
+    const stCls=m.status==='已发布'?'s-ok':(m.status==='测试中'?'s-wip':'s-risk');
+    tl.insertAdjacentHTML('beforeend',`<div class="tl-item ${cls}"><div class="tl-date">${m.date} · ${m.owner}</div><div class="tl-title">${m.ver} · ${m.code} <span class="status ${stCls}">${m.status}</span></div><div class="tl-desc">${m.deliver}（进度 ${m.progress}%）</div></div>`);
+  });
+}
+function renderMsTable(){
+  const tb=$('#msTable tbody'); tb.innerHTML='';
+  DATA.milestones.forEach(m=>{
+    const stCls=m.status==='已发布'?'s-ok':(m.status==='测试中'||m.status==='开发中'?'s-wip':'s-risk');
+    tb.insertAdjacentHTML('beforeend',`<tr><td>${m.ver}</td><td>${m.code}</td><td>${m.date}</td><td>${m.owner}</td><td>${m.deliver}</td><td><div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;width:120px;overflow:hidden;"><div style="height:100%;width:${m.progress}%;background:linear-gradient(90deg,#7c5cff,#22d3ee);"></div></div><span class="muted" style="font-size:12px;">${m.progress}%</span></td><td><span class="status ${stCls}">${m.status}</span></td></tr>`);
+  });
+}
+function renderDemandTable(){
+  const tb=$('#demandTable tbody'); tb.innerHTML='';
+  const filter=$('#demandFilter').value;
+  const kw=($('#demandSearch').value||'').trim().toLowerCase();
+  DATA.demands.filter(d=>{
+    if(filter && d.status!==filter) return false;
+    if(kw && !(d.title.toLowerCase().includes(kw)||d.module.toLowerCase().includes(kw)||d.owner.toLowerCase().includes(kw)||d.id.toLowerCase().includes(kw))) return false;
+    return true;
+  }).forEach(d=>{
+    const stCls=d.status==='已上线'?'s-ok':(d.status==='测试中'||d.status==='开发中'?'s-wip':(d.status==='延期风险'?'s-risk':'s-block'));
+    tb.insertAdjacentHTML('beforeend',`<tr><td>${d.id}</td><td>${d.title}</td><td>${d.module}</td><td>${d.owner}</td><td>${d.priority}</td><td><div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;width:120px;overflow:hidden;"><div style="height:100%;width:${d.progress}%;background:linear-gradient(90deg,#22d3ee,#7c5cff);"></div></div><span class="muted" style="font-size:12px;">${d.progress}%</span></td><td>${d.due}</td><td><span class="status ${stCls}">${d.status}</span></td></tr>`);
+  });
+}
+function renderBugTable(){
+  const tb=$('#bugTable tbody'); tb.innerHTML='';
+  const filter=$('#bugFilter').value;
+  const kw=($('#bugSearch').value||'').trim().toLowerCase();
+  const list=DATA.bugs.filter(b=>{
+    if(filter && b.sev!==filter) return false;
+    if(kw && !(b.title.toLowerCase().includes(kw)||b.module.toLowerCase().includes(kw)||b.owner.toLowerCase().includes(kw)||b.id.toLowerCase().includes(kw))) return false;
+    return true;
+  }).sort((a,b)=>a.sev.localeCompare(b.sev)||b.age-a.age);
+  list.forEach(b=>{
+    const sevCls='sev sev-'+b.sev.toLowerCase();
+    const stCls=b.status==='已修复'?'s-ok':(b.status==='新提交'?'s-risk':'s-wip');
+    tb.insertAdjacentHTML('beforeend',`<tr><td>${b.id}</td><td>${b.title}</td><td><span class="${sevCls}">${b.sev}</span></td><td>${b.module}</td><td>${b.found}</td><td>${b.owner}</td><td>${b.age} 天</td><td><span class="status ${stCls}">${b.status}</span></td></tr>`);
+  });
+}
+
+function renderRisk(){
+  const rm=$('#riskMatrix'); rm.innerHTML='';
+  rm.insertAdjacentHTML('beforeend','<div class="rc rc-h">影响↓ 概率→</div>');
+  for(let p=1;p<=5;p++) rm.insertAdjacentHTML('beforeend',`<div class="rc rc-h">P${p}</div>`);
+  for(let i=5;i>=1;i--){
+    rm.insertAdjacentHTML('beforeend',`<div class="rc rc-h">I${i}</div>`);
+    for(let p=1;p<=5;p++){
+      const score=i*p; const level=score>=20?5:score>=12?4:score>=8?3:score>=4?2:1;
+      const count=DATA.risks.filter(r=>r.impact===i&&r.prob===p).length;
+      rm.insertAdjacentHTML('beforeend',`<div class="rc rc-l${level}" title="影响${i} × 概率${p}">${count||''}</div>`);
+    }
+  }
+  const catMap={}; DATA.risks.forEach(r=>catMap[r.cat]=(catMap[r.cat]||0)+r.impact*r.prob);
+  const indicator=Object.keys(catMap).map(k=>({name:k,max:25}));
+  ec('chartRiskRadar',{tooltip:{},radar:{indicator,splitLine:{lineStyle:{color:getThemeVars().axisColor}},axisLine:{lineStyle:{color:getThemeVars().axisColor}},splitArea:{show:false},name:{color:getThemeVars().labelColor}},series:[{type:'radar',data:[{value:Object.values(catMap),name:'风险',areaStyle:{color:'rgba(239,68,68,0.25)'},lineStyle:{color:'#ef4444'},itemStyle:{color:'#ef4444'}}]}]});
+  const list=$('#riskList'); list.innerHTML='';
+  DATA.risks.slice().sort((a,b)=>b.impact*b.prob-a.impact*a.prob).forEach(r=>{
+    const score=r.impact*r.prob;
+    const level=score>=20?'极高':score>=12?'高':score>=8?'中':'低';
+    const levelColor=score>=20?'#ef4444':score>=12?'#f97316':score>=8?'#f59e0b':'#22c55e';
+    const stCls=r.status==='已升级'?'s-block':(r.status==='进行中'?'s-wip':'s-risk');
+    list.insertAdjacentHTML('beforeend',`<div class="risk-card"><div class="head"><h4>${r.id} · ${r.title}</h4><span class="status ${stCls}">${r.status}</span></div><div class="muted" style="font-size:12px;">类别：${r.cat} · 负责人：${r.owner}</div><div style="margin:10px 0;display:flex;gap:8px;align-items:center;"><span style="background:${levelColor};color:#fff;padding:2px 10px;border-radius:6px;font-size:12px;font-weight:600;">${level}风险</span><span class="muted" style="font-size:12px;">影响 ${r.impact} × 概率 ${r.prob} = ${score}</span></div><div style="font-size:13px;line-height:1.7;"><b>应对：</b>${r.mitigation}</div></div>`);
+  });
+}
+
+function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function genReport(kind){
+  const d=DATA.demands,bugs=DATA.bugs;
+  const done=d.filter(x=>x.status==='已上线').length;
+  const wip=d.filter(x=>x.status==='开发中').length;
+  const rate=Math.round(done/d.length*100);
+  const p0=bugs.filter(b=>b.sev==='P0');
+  const p1=bugs.filter(b=>b.sev==='P1');
+  const risks=DATA.risks.filter(r=>r.impact*r.prob>=12);
+  const delayed=d.filter(x=>x.status==='延期风险');
+  let md='';
+  if(kind==='daily'){
+    md=`# PM 日报 · ${todayStr()}
+
+## 一、今日进度
+- 总需求 ${d.length} 项，已交付 ${done} 项（交付率 **${rate}%**），开发中 ${wip} 项
+- 本日关键进展：首页性能优化进入灰度；会员订阅链路完成核心接口联调
+
+## 二、质量水位
+- P0 Bug：**${p0.length} 个** ${p0.map(b=>'`'+b.id+'` '+b.title).join('、')||'无'}
+- P1 Bug：**${p1.length} 个**（24h SLA 跟踪中）
+- 近 7 日 Bug 日均新增：${Math.round(DATA.daily.slice(-7).reduce((a,b)=>a+b.bugNew,0)/7)} 个
+
+## 三、风险 / 阻塞
+${risks.map(r=>`- **[${r.cat}]** ${r.title} · 负责人：${r.owner} · 应对：${r.mitigation}`).join('\n')||'- 暂无高风险项'}
+
+## 四、明日计划
+- P0 Bug 清零，P1 存量减半
+- 推进 v7.14 极光版本测试闭环
+- 双周回顾会材料准备
+
+---
+*由 AI助手小金自动生成 · 数据来源：本地示例数据仓库*`;
+  } else if(kind==='biweekly'){
+    md=`# PM 双周报 · ${DATA.meta.window[0]} ~ ${DATA.meta.window[1]}
+
+## 一、总体概览
+- 需求吞吐：总计 ${d.length} 项，交付 ${done} 项，**交付率 ${rate}%**
+- 质量水位：Bug 存量 ${bugs.length}，其中 P0/P1 共 ${p0.length+p1.length} 个
+- 里程碑：v7.12 春潮、v7.13 银河 **按时发布**；v7.14 极光进入测试
+
+## 二、本双周亮点
+1. ✅ 登录统一改造、活动模板化、新手引导重构三项核心能力上线
+2. ✅ 内容审核模型升级带来审核效率 +30%（示例指标）
+3. ✅ A/B 实验平台升级完成，实验创建效率提升
+
+## 三、待关注
+- ⚠️ **${delayed.length} 项需求存在延期风险**：${delayed.map(x=>x.title).join('、')}
+- ⚠️ P0 Bug 存量偏高（${p0.length} 个），已升级 24h SLA
+- ⚠️ v7.14 与 v7.15 测试人力叠加，已启动自动化回归分流
+
+## 四、风险态势
+${DATA.risks.slice(0,5).map((r,i)=>`${i+1}. **${r.title}** · 等级 ${r.impact*r.prob} · ${r.status}`).join('\n')}
+
+## 五、下双周重点
+- 🎯 v7.14 极光版本发布（4/24）
+- 🎯 v7.15 星轨版本主体开发完成
+- 🎯 质量专项：崩溃率专项 + 包体瘦身
+
+---
+*由 AI助手小金自动生成*`;
+  } else {
+    md=`# 项目例会议程 · ${todayStr()}
+
+## 与会人员
+- PM 团队、研发负责人、QA 负责人、设计代表
+
+## 议程
+
+### 1. 版本进度同步（10 min）
+- v7.14 极光：进度 70%，${bugs.filter(b=>b.module==='首页'||b.module==='会员').length} 个关联 Bug
+- v7.15 星轨：进度 35%，需求澄清 + 核心模块开发
+
+### 2. 质量专题（10 min）
+- P0 Bug 清零 Timeline：${p0.map(b=>b.id+' '+b.title).join('；')||'无 P0 Bug'}
+- P1 Bug 存量：${p1.length} 个，责任人明确
+
+### 3. 风险同步与升级（10 min）
+${risks.map(r=>`- **${r.title}**（${r.status}）→ 决策：${r.mitigation}`).join('\n')}
+
+### 4. 跨团队协作事项（5 min）
+- 会员订阅第三方依赖对齐
+- 隐私弹窗合规走查
+- 测试资源协调
+
+### 5. Action Items
+| 负责人 | 事项 | DDL |
+|--|--|--|
+| 小A | 会员续费闪退 P0 修复 | 04-23 |
+| 小B | 低端机白屏灰度验证 | 04-22 |
+| QA | 24h SLA 日报机制落地 | 04-22 |
+
+---
+*由 AI助手小金自动生成*`;
+  }
+  $('#reportArea').textContent=md;
+  $('#reportArea').dataset.kind=kind;
+}
+function copyReport(){ navigator.clipboard.writeText($('#reportArea').textContent).then(()=>alert('已复制到剪贴板')); }
+function downloadReport(){
+  const txt=$('#reportArea').textContent;
+  const kind=$('#reportArea').dataset.kind||'report';
+  const blob=new Blob([txt],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`xiaojin-${kind}-${todayStr()}.md`; a.click();
+  URL.revokeObjectURL(url);
+}
+function renderReportHistory(){
+  const tb=$('#reportHistory tbody'); tb.innerHTML='';
+  DATA.reportHistory.forEach(r=>{
+    tb.insertAdjacentHTML('beforeend',`<tr><td>${r.date}</td><td>${r.type}</td><td>${r.topic}</td><td><span class="status s-ok">${r.status}</span></td></tr>`);
+  });
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='xiaojin-data-warehouse.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+$('#globalSearch').addEventListener('keydown',(e)=>{
+  if(e.key!=='Enter') return;
+  const kw=e.target.value.trim().toLowerCase(); if(!kw) return;
+  if(/p0|p1|p2|p3|bug/i.test(kw)){ navigateTo('bug'); $('#bugSearch').value=kw; renderBugTable(); }
+  else if(/req|需求/i.test(kw)||kw.startsWith('req')){ navigateTo('demand'); $('#demandSearch').value=kw; renderDemandTable(); }
+  else if(/版本|里程|v7/i.test(kw)){ navigateTo('milestone'); }
+  else if(/风险/i.test(kw)){ navigateTo('risk'); }
+  else { navigateTo('demand'); $('#demandSearch').value=kw; renderDemandTable(); }
+});
+function navigateTo(page){ const a=document.querySelector(`#nav a[data-page="${page}"]`); if(a) a.click(); }
+
+$('#demandFilter').addEventListener('change',renderDemandTable);
+$('#demandSearch').addEventListener('input',renderDemandTable);
+$('#bugFilter').addEventListener('change',renderBugTable);
+$('#bugSearch').addEventListener('input',renderBugTable);
+
+function toggleChat(){ $('#chat').classList.toggle('open'); }
+function ask(q){ $('#chatInput').value=q; sendChat(); }
+function addMsg(text,me){ const body=$('#chatBody'); const el=document.createElement('div'); el.className='msg '+(me?'me':'bot'); el.innerHTML=text; body.appendChild(el); body.scrollTop=body.scrollHeight; }
+function sendChat(){ const input=$('#chatInput'); const q=input.value.trim(); if(!q) return; addMsg(q,true); input.value=''; setTimeout(()=>addMsg(answer(q),false),300); }
+function answer(q){
+  const s=q.toLowerCase(); const bugs=DATA.bugs; const demands=DATA.demands;
+  if(/p0/.test(s)){ const p0=bugs.filter(b=>b.sev==='P0'); return `当前 P0 Bug 共 <b>${p0.length}</b> 个：<br>${p0.map(b=>`• [${b.id}] ${b.title}（${b.module}，${b.owner}，停留 ${b.age} 天）`).join('<br>')}`; }
+  if(/p1/.test(s)){ const p1=bugs.filter(b=>b.sev==='P1'); return `当前 P1 Bug 共 <b>${p1.length}</b> 个，其中停留最久的 3 个：<br>${p1.slice().sort((a,b)=>b.age-a.age).slice(0,3).map(b=>`• [${b.id}] ${b.title}（${b.age} 天）`).join('<br>')}`; }
+  if(/延期|风险.*需求|需求.*风险/.test(s)||/延期/.test(q)){ const list=demands.filter(x=>x.status==='延期风险'); if(list.length===0) return '太棒了，当前没有延期风险的需求 🎉'; return `存在延期风险的需求 <b>${list.length}</b> 个：<br>${list.map(x=>`• ${x.id} ${x.title}（负责人：${x.owner}，预计 ${x.due}，进度 ${x.progress}%）`).join('<br>')}`; }
+  if(/交付率|进度/.test(q)){ const done=demands.filter(x=>x.status==='已上线').length; return `近一个月交付率：<b>${Math.round(done/demands.length*100)}%</b>（${done} / ${demands.length}）`; }
+  if(/里程碑|版本/.test(q)){ const next=DATA.milestones.find(m=>m.status!=='已发布'); return `已发布 ${DATA.milestones.filter(m=>m.status==='已发布').length} 个版本；下一个：<b>${next?next.ver+' '+next.code:'无'}</b>${next?`，计划 ${next.date}，进度 ${next.progress}%`:''}`; }
+  if(/风险/.test(q)){ const high=DATA.risks.filter(r=>r.impact*r.prob>=12); return `高风险项（评分 ≥ 12）共 <b>${high.length}</b> 个：<br>${high.map(r=>`• ${r.title}（${r.cat}，${r.status}）`).join('<br>')}`; }
+  if(/日报/.test(q)){ genReport('daily'); navigateTo('report'); return '✅ 已生成今日日报并跳转到报告页。'; }
+  if(/双周报/.test(q)){ genReport('biweekly'); navigateTo('report'); return '✅ 已生成双周报。'; }
+  if(/例会|纪要|议程/.test(q)){ genReport('meeting'); navigateTo('report'); return '✅ 已生成例会议程。'; }
+  if(/你是谁|介绍/.test(q)){ return `我是 <b>AI助手小金</b> 👋<br>基于本地数据仓库（2026-03-20 ~ 04-20）提供：<br>• 需求 / Bug / 里程碑 / 风险 查询<br>• 日报 / 双周报 / 例会 自动生成<br>• 关键指标看板一屏直达`; }
+  return '抱歉，这个问题我暂时没有直接答案 😅 你可以试试："P0 Bug 有多少"、"延期风险的需求"、"生成双周报"、"高风险项" 等。';
+}
+
+/* ========== 图表重绘 ========== */
+function reRenderAllCharts(){
+  try{ renderOverviewCharts(); renderDemandCharts(); renderBugCharts(); renderGantt(); renderRisk(); }catch(e){}
+}
+
+/* ========== 绑定主题按钮 ========== */
+function bindThemeSwitch(){
+  $$('#themeSwitch button').forEach(b=>{
+    b.addEventListener('click',()=>setTheme(b.dataset.themeBtn));
+  });
+  const saved = localStorage.getItem('xiaojin-theme') || 'dark';
+  $$('#themeSwitch button').forEach(b=>b.classList.toggle('active', b.dataset.themeBtn===saved));
+}
+
+function boot(){
+  bindThemeSwitch();
+  axisStyle = buildAxisStyle();
+  legendStyle = buildLegendStyle();
+  renderKPIs(); renderOverviewCharts(); renderDemandCharts(); renderDemandTable();
+  renderBugCharts(); renderBugTable();
+  renderGantt(); renderTimeline(); renderMsTable();
+  renderRisk(); renderReportHistory();
+  window.__xjBooted = true;
+  // 跨窗口同步：管理员保存后触发
+  window.addEventListener('storage',(e)=>{
+    if(e.key==='xiaojin-data'){
+      try{
+        const obj = JSON.parse(e.newValue||'{}');
+        ['demands','bugs','milestones','risks','reportHistory','meta'].forEach(k=>{ if(obj[k]!==undefined) DATA[k]=obj[k]; });
+        renderKPIs(); renderDemandTable(); renderBugTable(); renderMsTable(); renderTimeline(); renderReportHistory();
+        reRenderAllCharts();
+        console.log('[xiaojin] 数据已同步管理员更新');
+      }catch(err){}
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', boot);
+if(document.readyState!=='loading') boot();
+</script>
+</body>
+</html>
