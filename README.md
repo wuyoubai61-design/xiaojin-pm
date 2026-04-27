@@ -1,0 +1,185 @@
+# AI助手小金 · 产品经理日常管理驾驶舱
+
+> 一个面向产品经理（PM）的轻量级单文件管理驾驶舱 Demo，集成 **需求管理 / Bug 质量 / 版本里程碑 / 风险识别 / 报告生成 / 智能问答** 六大核心模块，开箱即用，零依赖部署。
+
+![status](https://img.shields.io/badge/status-demo-blue) ![version](https://img.shields.io/badge/version-v1.0-7c5cff) ![license](https://img.shields.io/badge/license-MIT-green) ![single--file](https://img.shields.io/badge/single--file-✓-22d3ee)
+
+---
+
+## ✨ 项目简介
+
+**AI助手小金** 是一个为产品经理（尤其是版本/项目 PM）设计的可视化管理驾驶舱。它以"一屏掌握项目水位"为目标，将分散在 TAPD、Bug 系统、版本流水线中的关键数据，整合到一个**单 HTML 文件**中，无需后端、无需构建，双击即可在浏览器中运行。
+
+适用场景：
+- 🎯 PM 日常项目管理与汇报
+- 🎯 版本周期内的进度 / 质量 / 风险一屏总览
+- 🎯 简历项目展示 / 面试 Demo 演示
+- 🎯 团队内部数据看板原型验证
+
+---
+
+## 🚀 在线预览
+
+> 部署到 GitHub Pages 后即可访问：
+
+```
+https://<你的GitHub用户名>.github.io/<仓库名>/ai-assistant-xiaojin.html
+```
+
+部署方式见下方 [部署到 GitHub Pages](#-部署到-github-pages)。
+
+---
+
+## 🧩 核心功能
+
+### 1. 总览看板（Overview）
+- **4 大 KPI 卡片**：进行中需求、活跃 Bug、里程碑完成度、高风险项
+- **趋势图**：近 30 天需求完成 vs Bug 新增/关闭日趋势
+- **分布图**：Bug 优先级分布、研发模块负载、里程碑达成率仪表盘、风险等级雷达
+
+### 2. 研发需求管理（Demand）
+- 需求状态分布（已上线 / 测试中 / 开发中 / 待开发 / 延期风险）
+- 负责人工作量 TOP 排行
+- 需求明细表（支持按状态筛选 + 关键词搜索）
+- 进度可视化条 + 延期预警
+
+### 3. Bug 质量管理（Bug）
+- 期内新增 / 已关闭 / P0+P1 存量 / 平均解决时长 KPI
+- Bug 新增 vs 关闭日趋势柱状图
+- 模块缺陷热力分布
+- 活跃 Bug 明细（按等级筛选 + 停留天数排序）
+
+### 4. 版本节点 / 里程碑（Milestone）
+- **甘特视图**：版本周期 + 进度叠加渲染
+- **里程碑时间轴**：清晰呈现已发布 / 测试中 / 开发中状态
+- 版本发布计划表 + 关键产出说明
+
+### 5. 风险识别（Risk）
+- **风险矩阵**（影响 5 × 概率 5 = 25 格）自动着色分级
+- 风险分类雷达（进度 / 依赖 / 质量 / 效果 / 合规 / 稳定性 / 资源）
+- 风险卡片明细（含等级评分、应对策略、负责人）
+
+### 6. 日报 / 双周报 / 例会（Report）
+- 一键生成 **PM 日报**（今日进度 + 质量水位 + 风险 + 明日计划）
+- 一键生成 **双周报**（吞吐 / 亮点 / 风险 / 下周重点）
+- 一键生成 **例会议程**（议程 + Action Items）
+- 支持 **复制 / 下载 Markdown** + 历史报告查阅
+
+### 7. AI 问答助手（小金）
+- 浮动聊天面板，支持自然语言问答
+- 内置场景：P0/P1 Bug 查询、延期需求、交付率、风险项、报告生成等
+- 基于本地数据仓库即时回答，无需联网
+
+---
+
+## 🛠️ 技术栈
+
+| 类别 | 技术 |
+|------|------|
+| 前端 | 原生 HTML + CSS + JavaScript（无框架） |
+| 图表 | [ECharts 5.4.3](https://echarts.apache.org/)（CDN 引入） |
+| 数据 | 内嵌 JSON 数据仓库（虚构脱敏示例） |
+| 主题 | 深色 / 浅色双主题切换（localStorage 持久化） |
+| 兼容 | Chrome / Edge / Safari / Firefox 现代浏览器 |
+| 部署 | 单文件，零构建，可直接静态托管 |
+
+---
+
+## 📂 项目结构
+
+```
+.
+├── ai-assistant-xiaojin.html   # 主文件（所有功能集成于此）
+└── README.md                    # 本说明文档
+```
+
+---
+
+## ⚡ 快速开始
+
+### 方式一：本地运行（最简单）
+1. 下载 `ai-assistant-xiaojin.html`
+2. 双击在浏览器中打开即可
+
+### 方式二：克隆仓库
+```bash
+git clone https://github.com/<你的用户名>/<仓库名>.git
+cd <仓库名>
+# 使用任意静态服务器，例如：
+npx serve .
+# 或使用 Python
+python -m http.server 8080
+```
+然后访问 `http://localhost:8080/ai-assistant-xiaojin.html`
+
+---
+
+## 🌐 部署到 GitHub Pages
+
+1. **创建仓库**：在 GitHub 新建一个仓库（例如 `ai-assistant-xiaojin`）
+2. **推送代码**：
+   ```bash
+   git init
+   git add .
+   git commit -m "feat: 初始化 AI助手小金项目"
+   git branch -M main
+   git remote add origin https://github.com/<你的用户名>/<仓库名>.git
+   git push -u origin main
+   ```
+3. **开启 Pages**：
+   - 进入仓库 `Settings` → `Pages`
+   - `Source` 选择 `Deploy from a branch`
+   - `Branch` 选择 `main` + `/ (root)`，保存
+4. **访问链接**：
+   ```
+   https://<你的用户名>.github.io/<仓库名>/ai-assistant-xiaojin.html
+   ```
+
+---
+
+## 📊 数据说明
+
+- 当前页面内置数据为 **虚构脱敏示例数据**，时间窗口：`2026-03-20 ~ 2026-04-20`
+- 数据存储在 HTML 文件内的 `DATA` 全局对象中，包含：
+  - `demands` 22 条需求
+  - `bugs` 17 条缺陷
+  - `daily` 32 天每日趋势
+  - `milestones` 5 个版本里程碑
+  - `risks` 8 项风险
+  - `reportHistory` 历史报告
+- 支持通过 `localStorage` 的 `xiaojin-data` 键覆盖数据，便于后续接入管理员端
+
+---
+
+## 🎨 界面亮点
+
+- 🌙 **深色 / 浅色** 双主题，一键切换
+- 💎 渐变高光 + 玻璃拟态卡片设计
+- 📱 响应式布局，1100px 以下自动切换为单列
+- ⚡ 平滑过渡动画 + 悬浮交互反馈
+- 🔍 顶部全局搜索：支持需求 / Bug / 里程碑 / 风险一键跳转
+
+---
+
+## 🗺️ 后续规划（Roadmap）
+
+- [ ] 接入真实 TAPD / Jira API 数据源
+- [ ] 增加管理员端配置页（数据可在线编辑）
+- [ ] 支持多版本对比分析
+- [ ] 报告模板自定义编辑器
+- [ ] 集成大语言模型（LLM），实现真实的对话式 PM 助手
+- [ ] 团队权限与多人协作
+
+---
+
+## 📝 License
+
+MIT License © 2026 — Made with ❤️ for Product Managers.
+
+---
+
+## 🙋 关于作者
+
+如有建议或合作意向，欢迎通过 GitHub Issue 联系。
+
+> *本项目由 PM 视角出发，致力于让"项目管理可视化"变得简单高效。*
